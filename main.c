@@ -25,9 +25,7 @@ void
 add(MaE *arr, int val) {
     if (arr->len >= arr->cap) {
         arr->cap = arr->cap << 1;
-        
-        printf("LEN %d, CAP: %d \n", arr->len, arr->cap);
-        
+                
         int *r = realloc(arr->data, arr->cap * sizeof(int));
         if (!r) {
             fprintf(stderr, "Memory realloc failed\n");
@@ -54,21 +52,49 @@ get_index(MaE *arr, int s_value) {
     return index;
 }
 
+void
+delete(MaE *arr, int d_value) {
+    int index = get_index(arr, d_value);
+    
+    if (index > -1) {
+        for (int i = (index + 1); i < arr->len; i++) {
+            arr->data[i - 1] = arr->data[i];
+        }
+
+        arr->len = arr->len - 1;
+    }
+}
+
 /*
-    Add free, delete, insert
+ Add CAP >
+ Add ele last
+ */
+void 
+insert_by_index(MaE *arr, int i_value, int index) {
+   for (int i = (arr->len - 1); i >= index; i--) {
+        arr->data[i + 1] = arr->data[i];
+    }
+
+    arr->len = arr->len + 1;
+    arr->data[index] = i_value;
+}
+
+/*
+    Add free
 */
 int
 main() {
     MaE arr;
 
-    init(&arr, 2);
+    init(&arr, 10);
 
     // For TEST NOT SORT
-    for (int i = 1; i <= 30; i++) {
+    for (int i = 1; i <= 5; i++) {
         add(&arr, i);
     }
     
     int index_v = get_index(&arr, 6);
     
-    printf("INDEX %d", index_v);
+    insert_by_index(&arr, 6, 5);
+    delete(&arr, 1);
 }
