@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 typedef struct {
     int *data;
@@ -16,6 +17,10 @@ init(MaE *arr, int cap) {
     arr->cap = cap;
 
     arr->data = malloc(arr->cap * sizeof(int));
+    if (!arr->data) {
+        fprintf(stderr, "Memory malloc failed\n");
+        exit(1);
+    }
 }
 
 /*
@@ -28,7 +33,7 @@ add(MaE *arr, int val) {
                 
         int *r = realloc(arr->data, arr->cap * sizeof(int));
         if (!r) {
-            fprintf(stderr, "Memory realloc failed\n");
+            fprintf(stderr, "memory realloc failed\n");
             exit(1);
         }
         
@@ -40,20 +45,17 @@ add(MaE *arr, int val) {
 
 int
 get_index(MaE *arr, int s_value) {
-    int index = -1;
-    
-    for(int i = 0; i <= arr->len; i++) {
+   for(int i = 0; i < arr->len; i++) {
         if (arr->data[i] == s_value) {
-            index = i;
-            break;
+            return i;
         }
     }
     
-    return index;
+    return -1;
 }
 
 void
-delete(MaE *arr, int d_value) {
+delete_value(MaE *arr, int d_value) {
     int index = get_index(arr, d_value);
     
     if (index > -1) {
@@ -71,7 +73,9 @@ delete(MaE *arr, int d_value) {
  */
 void 
 insert_by_index(MaE *arr, int i_value, int index) {
-   for (int i = (arr->len - 1); i >= index; i--) {
+    assert(index >= 0);
+    
+    for (int i = (arr->len - 1); i >= index; i--) {
         arr->data[i + 1] = arr->data[i];
     }
 
@@ -95,6 +99,6 @@ main() {
     
     int index_v = get_index(&arr, 6);
     
-    insert_by_index(&arr, 6, 5);
-    delete(&arr, 1);
+    insert_by_index(&arr, 6, -1);
+    delete_value(&arr, 1);
 }
