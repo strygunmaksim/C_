@@ -10,9 +10,9 @@ typedef struct {
 
 void
 expansion_cap(MaE *arr) {
-    arr->cap << 1;
+    arr->cap = arr->cap << 1;
 
-    int *r = realloc(arr, arr->cap * sizeof(int));
+    int *r = realloc(arr->data, arr->cap * sizeof(int));
 
     if (!r) {
         fprintf(stderr, "Memory malloc failed\n");
@@ -22,9 +22,7 @@ expansion_cap(MaE *arr) {
     arr->data = r;
 }
 
-/*
-    Error
-*/
+
 void
 init(MaE *arr, int cap) {
     arr->len = 0;
@@ -38,9 +36,7 @@ init(MaE *arr, int cap) {
     }
 }
 
-/*
- Error
-*/
+
 void
 add(MaE *arr, int val) {
     if (arr->len >= arr->cap) {
@@ -76,27 +72,29 @@ delete_value(MaE *arr, int d_value) {
 
 void 
 insert_by_index(MaE *arr, int i_value, int index) {
-    assert(index >= 0);
+    if (index < 0 || index > arr->len) {
+        fprintf(stderr, "Invalid index %d \n", index);
+
+        return;
+    }
     
     if (arr->len >= arr->cap) {
         expansion_cap(arr);
     }
 
-    if (index <= (arr->len - 1)) {
+    if (arr->len > index) {
         for (int i = (arr->len - 1); i >= index; i--) {
             arr->data[i + 1] = arr->data[i];
         }
 
-        arr->len = arr->len + 1;
         arr->data[index] = i_value;
     } else {
-        arr->len = arr->len + 1;
-        arr->data[arr->len - 1] = i_value;
+        arr->data[arr->len] = i_value;
     }
+
+    arr->len = arr->len + 1;
 }
 
-
-/**/
 void 
 print_MaE(MaE *arr, char *pos) {
     printf("%s\n", pos);
