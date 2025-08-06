@@ -8,6 +8,20 @@ typedef struct {
     int cap;
 } MaE;
 
+void
+expansion_cap(MaE *arr) {
+    arr->cap << 1;
+
+    int *r = realloc(arr, arr->cap * sizeof(int));
+
+    if (!r) {
+        fprintf(stderr, "Memory malloc failed\n");
+        exit(1);
+    }
+
+    arr->data = r;
+}
+
 /*
     Error
 */
@@ -17,6 +31,7 @@ init(MaE *arr, int cap) {
     arr->cap = cap;
 
     arr->data = malloc(arr->cap * sizeof(int));
+
     if (!arr->data) {
         fprintf(stderr, "Memory malloc failed\n");
         exit(1);
@@ -29,15 +44,7 @@ init(MaE *arr, int cap) {
 void
 add(MaE *arr, int val) {
     if (arr->len >= arr->cap) {
-        arr->cap = arr->cap << 1;
-                
-        int *r = realloc(arr->data, arr->cap * sizeof(int));
-        if (!r) {
-            fprintf(stderr, "memory realloc failed\n");
-            exit(1);
-        }
-        
-        arr->data = r;
+        expansion_cap(arr);
     }
 
     arr->data[arr->len++] = val;
@@ -67,21 +74,39 @@ delete_value(MaE *arr, int d_value) {
     }
 }
 
-/*
- Add CAP >
- Add ele last
- */
 void 
 insert_by_index(MaE *arr, int i_value, int index) {
     assert(index >= 0);
     
-    for (int i = (arr->len - 1); i >= index; i--) {
-        arr->data[i + 1] = arr->data[i];
+    if (arr->len >= arr->cap) {
+        expansion_cap(arr);
     }
 
-    arr->len = arr->len + 1;
-    arr->data[index] = i_value;
+    if (index <= (arr->len - 1)) {
+        for (int i = (arr->len - 1); i >= index; i--) {
+            arr->data[i + 1] = arr->data[i];
+        }
+
+        arr->len = arr->len + 1;
+        arr->data[index] = i_value;
+    } else {
+        arr->len = arr->len + 1;
+        arr->data[arr->len - 1] = i_value;
+    }
 }
+
+
+/**/
+void 
+print_MaE(MaE *arr, char *pos) {
+    printf("%s\n", pos);
+
+    printf("LENGTH: %d \n", arr->len);
+
+    for (int i = 0; i < arr->len; i++) {
+        printf("EL: %d ", arr->data[i]);
+    }
+} 
 
 /*
     Add free
@@ -96,9 +121,4 @@ main() {
     for (int i = 1; i <= 5; i++) {
         add(&arr, i);
     }
-    
-    int index_v = get_index(&arr, 6);
-    
-    insert_by_index(&arr, 6, -1);
-    delete_value(&arr, 1);
 }
